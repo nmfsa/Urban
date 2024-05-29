@@ -1,6 +1,6 @@
 class Buiding:
 
-    def __init__(self, numberOfFloors, buildingType):
+    def __init__(self, numberOfFloors: int, buildingType: str):
         self.numberOfFloors = numberOfFloors
         self.buildingType = buildingType
 
