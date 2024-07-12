@@ -11,17 +11,20 @@ class User:
     def __str__(self):
         return f'{self.nickname}'
 
-    def __hash__(self):
-        return hash(self.password)
-
 
 class Video:
 
-    def __init__(self, title: str, duration: int, time_now=0, adult_mode=False):
+    def __init__(self, title: str, duration: int, adult_mode=False):
         self.title = title
         self.duration = duration
-        self.time_now = time_now
+        self.time_now = 0
         self.adult_mode = adult_mode
+
+    def __eq__(self, other):
+        return self.title == other.title
+
+    def __contains__(self, item):
+        return item in self.title
 
 
 class UrTube:
@@ -37,25 +40,22 @@ class UrTube:
                 pass
 
     def register(self, nickname: str, password: str, age: int):
+        password = hash(password)
         for user in self.users:
-            if nickname in user.nickname:
+            if nickname == user.nickname:
                 print(f"Пользователь {nickname} уже существует")
-                break
-        else:
-            user = User(nickname, password, age)
-            self.users.append(user)
-            self.log_out()
-            self.log_in(user.nickname, user.password)
+                return
+        new_user = User(nickname, password, age)
+        self.users.append(new_user)
+        self.current_user = new_user
 
     def log_out(self):
         self.current_user = None
 
     def add(self, *many_videos):
         for i in many_videos:
-            if i not in self.videos:
+            if i.title not in [video.title for video in self.videos]:
                 self.videos.append(i)
-            else:
-                continue
 
     def get_videos(self, a: str):
         movies = []
@@ -65,14 +65,17 @@ class UrTube:
         return movies
 
     def watch_video(self, film: str):
-        if self.current_user and self.current_user.age < 18:
-            print('Вам нет 18 лет, пожалуйста покиньте страницу')
-        elif self.current_user:
+        if self.current_user:
             for video in self.videos:
+                if self.current_user and self.current_user.age < 18:
+                    print('Вам нет 18 лет, пожалуйста покиньте страницу')
+                    return
                 if film in video.title:
                     for i in range(1, 11):
                         print(i, end=' ')
                         time.sleep(1)
+                        video.time_now += 1
+                    video.time_now = 0
                     print('Конец видео')
 
         else:
