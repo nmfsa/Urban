@@ -36,8 +36,6 @@ class UrTube:
         for user in self.users:
             if login == user.nickname and password == user.password:
                 self.current_user = user
-            else:
-                pass
 
     def register(self, nickname: str, password: str, age: int):
         password = hash(password)
@@ -67,17 +65,16 @@ class UrTube:
     def watch_video(self, film: str):
         if self.current_user:
             for video in self.videos:
-                if self.current_user and self.current_user.age < 18:
-                    print('Вам нет 18 лет, пожалуйста покиньте страницу')
-                    return
                 if film in video.title:
-                    for i in range(1, 11):
+                    if video.adult_mode and self.current_user.age < 18:
+                        print('Вам нет 18 лет, пожалуйста покиньте страницу')
+                        return
+                    for i in range(video.duration):
                         print(i, end=' ')
                         time.sleep(1)
                         video.time_now += 1
                     video.time_now = 0
                     print('Конец видео')
-
         else:
             print('Войдите в аккаунт, чтобы смотреть видео')
 
